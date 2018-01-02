@@ -1,0 +1,18 @@
+---
+- hosts: all
+  become: yes
+  user: vagrant
+  connection: ssh
+  vars_files:
+    - vars.yml
+  strategy: free
+  tasks:
+    - name: Add the google signing key
+      apt_key: url=https://packages.cloud.google.com/apt/doc/apt-key.gpg state=present
+
+    - name: Add the k8s apt repo
+      apt_repository: repo='deb http://apt.kubernetes.io/ kubernetes-xenial main' state=present
+
+    - name: Install packages
+      apt: name={{ item }} state=installed update_cache=yes force=yes
+      with_items: "{{ PACKAGES }}"
